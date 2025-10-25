@@ -1,0 +1,19 @@
+
+**** Clean-only build of configuration Debug for project Lab1ref_InputOutput ****
+
+"C:\\ti\\ccsv7\\utils\\bin\\gmake" -k -j 24 clean -O 
+ 
+DEL /F  "Lab1ref_InputOutput.hex"  "Lab1ref_InputOutput.out" 
+DEL /F "InputOutput.lst" "startup_msp432p401r_ccs.lst" "system_msp432p401r.lst" 
+DEL /F "InputOutput.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" 
+DEL /F "InputOutput.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" 
+DEL /F "InputOutput.asm" "startup_msp432p401r_ccs.asm" "system_msp432p401r.asm" 
+Could Not Find C:\Users\R240019\Desktop\SC2107_HARI\endoflab1 (2)\endoflab1\RSLK-Max-CE2007Labs-students-01062022\CE2007\Lab1ref_InputOutput\Debug\Lab1ref_InputOutput.hex
+Could Not Find C:\Users\R240019\Desktop\SC2107_HARI\endoflab1 (2)\endoflab1\RSLK-Max-CE2007Labs-students-01062022\CE2007\Lab1ref_InputOutput\Debug\InputOutput.lst
+Could Not Find C:\Users\R240019\Desktop\SC2107_HARI\endoflab1 (2)\endoflab1\RSLK-Max-CE2007Labs-students-01062022\CE2007\Lab1ref_InputOutput\Debug\InputOutput.obj
+Could Not Find C:\Users\R240019\Desktop\SC2107_HARI\endoflab1 (2)\endoflab1\RSLK-Max-CE2007Labs-students-01062022\CE2007\Lab1ref_InputOutput\Debug\InputOutput.d
+Could Not Find C:\Users\R240019\Desktop\SC2107_HARI\endoflab1 (2)\endoflab1\RSLK-Max-CE2007Labs-students-01062022\CE2007\Lab1ref_InputOutput\Debug\InputOutput.asm
+'Finished clean'
+ 
+
+**** Build Finished ****

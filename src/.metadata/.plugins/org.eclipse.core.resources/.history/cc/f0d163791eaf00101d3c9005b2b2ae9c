@@ -1,0 +1,105 @@
+#include <stdint.h>
+#include "msp.h"
+#include "../inc/Clock.h"
+#include "../inc/CortexM.h"
+#include "../inc/IRDistance.h"
+#include "../inc/TimerA1.h"
+#include "../inc/UART0.h"
+#include "../inc/LaunchPad.h"
+#include "../inc/ADC14.h"
+#include "../inc/LPF.h"
+#include "../inc/Motor.h"           // <<< === NEW
+#include "../inc/PWM.h"             // <<< === Required for motors
+#include "../inc/Bump.h"
+
+#define OBSTACLE_DISTANCE 180       // mm
+#define MOTOR_SPEED 1000            // 0 to 14998
+#define BACKUP_TIME 500             // ms
+#define TURN_TIME   400             // ms
+
+volatile uint32_t ADCvalue;
+volatile uint32_t ADCflag;
+volatile uint32_t nr,nc,nl;
+volatile uint32_t left,center,right;
+volatile uint32_t bumpState;
+void SensorRead_ISR(void){  // runs at 2000 Hz
+  uint32_t raw17,raw12,raw16;
+  P1OUT ^= 0x01;         // profile
+  P1OUT ^= 0x01;         // profile
+  ADC_In17_12_16(&raw17,&raw12,&raw16);  // sample
+  nr = LPF_Calc(raw17);  // right is channel 17 P9.0
+  nc = LPF_Calc2(raw12);  // center is channel 12, P4.1
+  nl = LPF_Calc3(raw16);  // left is channel 16, P9.1
+  ADCflag = 1;           // semaphore
+  P1OUT ^= 0x01;         // profile
+}
+
+int main(void){
+  uint32_t raw17,raw12,raw16;
+  int32_t n;
+  uint32_t s = 256;
+
+  Clock_Init48MHz();          // 48 MHz
+  ADCflag = 0;
+  ADC0_InitSWTriggerCh17_12_16();   // initialize ADC channels
+  ADC_In17_12_16(&raw17,&raw12,&raw16);
+  LPF_Init(raw17, s);
+  LPF_Init2(raw12, s);
+  LPF_Init3(raw16, s);
+
+  UART0_Init();               // UART at 115200
+  LaunchPad_Init();
+  Motor_Init();               // <<< === Initialize motors
+  TimerA1_Init(&SensorRead_ISR, 250); // 2000 Hz sampling
+
+  UART0_OutString("GP2Y0A21YK0F test\nValvano Oct 2017\nConnect analog signals to P9.0,P4.1,P9.1\n");
+
+  EnableInterrupts();
+
+  while(1){
+
+    for(n=0; n<2000; n++){
+      while(ADCflag == 0);
+      ADCflag = 0;
+    }
+
+    left = LeftConvert(nl);
+    center = CenterConvert(nc);
+    right = RightConvert(nr);
+
+    // Debug print to terminal (optional)
+    UART0_OutUDec5(left);UART0_OutString(" mm, ");
+    UART0_OutUDec5(center);UART0_OutString(" mm, ");
+    UART0_OutUDec5(right);UART0_OutString(" mm\r\n");
+
+    // === OBSTACLE AVOIDANCE LOGIC ===
+    if(center < OBSTACLE_DISTANCE || left < OBSTACLE_DISTANCE || right < OBSTACLE_DISTANCE){
+
+        // Obstacle detected → stop and react
+        Motor_Stop();
+        Delay_ms(100);  // brief pause
+
+        // Step 1: Back up
+        Motor_Backward(MOTOR_SPEED, MOTOR_SPEED);
+        Delay_ms(BACKUP_TIME);
+        Motor_Stop();
+        Delay_ms(100);
+
+        // Step 2: Turn away from closer side
+        if(left < right){
+            // Turn right
+            Motor_Right(MOTOR_SPEED, MOTOR_SPEED);
+        } else {
+            // Turn left
+            Motor_Left(MOTOR_SPEED, MOTOR_SPEED);
+        }
+
+        Delay_ms(TURN_TIME);
+        Motor_Stop();
+        Delay_ms(100);
+    } else {
+        // No obstacle → go forward
+        Motor_Forward(MOTOR_SPEED, MOTOR_SPEED);
+    }
+  }
+}
