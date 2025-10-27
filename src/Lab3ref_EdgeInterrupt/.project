@@ -28,17 +28,23 @@
 		<link>
 			<name>Clock.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Clock.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Clock.c</locationURI>
 		</link>
 		<link>
 			<name>CortexM.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/CortexM.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/CortexM.c</locationURI>
 		</link>
 		<link>
 			<name>TExaS.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/TExaS.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/TExaS.c</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>ORIGINAL_PROJECT_ROOT</name>
+			<value>file:/C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/Lab3ref_EdgeInterrupt</value>
+		</variable>
+	</variableList>
 </projectDescription>

@@ -1,6 +1,6 @@
 # FIXED
 
-SysTick.obj: C:/Users/R240019/Downloads/SC2107_HARI/SC2107_HARI/endoflab1\ (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/SysTick.c
+SysTick.obj: C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/SysTick.c
 SysTick.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include/stdint.h
 SysTick.obj: C:/ti/ccsv7/ccs_base/arm/include/msp.h
 SysTick.obj: C:/ti/ccsv7/ccs_base/arm/include/msp432p401r.h
@@ -11,7 +11,7 @@ SysTick.obj: C:/ti/ccsv7/ccs_base/arm/include/CMSIS/core_cm4.h
 SysTick.obj: C:/ti/ccsv7/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 SysTick.obj: C:/ti/ccsv7/ccs_base/arm/include/system_msp432p401r.h
 
-C:/Users/R240019/Downloads/SC2107_HARI/SC2107_HARI/endoflab1\ (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/SysTick.c: 
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/SysTick.c: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include/stdint.h: 
 C:/ti/ccsv7/ccs_base/arm/include/msp.h: 
 C:/ti/ccsv7/ccs_base/arm/include/msp432p401r.h: 

@@ -28,42 +28,48 @@
 		<link>
 			<name>ADC14.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/ADC14.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/ADC14.c</locationURI>
 		</link>
 		<link>
 			<name>Clock.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Clock.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Clock.c</locationURI>
 		</link>
 		<link>
 			<name>CortexM.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/CortexM.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/CortexM.c</locationURI>
 		</link>
 		<link>
 			<name>IRDistance.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/IRDistance.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/IRDistance.c</locationURI>
 		</link>
 		<link>
 			<name>LPF.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/LPF.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/LPF.c</locationURI>
 		</link>
 		<link>
 			<name>LaunchPad.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/LaunchPad.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/LaunchPad.c</locationURI>
 		</link>
 		<link>
 			<name>TimerA1.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/TimerA1.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/TimerA1.c</locationURI>
 		</link>
 		<link>
 			<name>UART0.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/UART0.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/UART0.c</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>ORIGINAL_PROJECT_ROOT</name>
+			<value>file:/C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/Lab4_ADC_IRSensors</value>
+		</variable>
+	</variableList>
 </projectDescription>

@@ -49,16 +49,16 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "..\inc\SysTickInts.h"
 #include "..\inc\CortexM.h"
 #include "..\inc\TimerA1.h"
-//#include "..\inc\Bump.h"
-#include "..\inc\BumpInt.h"
+#include "..\inc\Bump.h"
+//#include "..\inc\BumpInt.h"
 #include "..\inc\LaunchPad.h"
 #include "..\inc\Motor.h"
-#include "../inc/IRDistance.h"
-#include "../inc/ADC14.h"
-#include "../inc/LPF.h"
+#include "..\inc\IRDistance.h"
+#include "..\inc\ADC14.h"
+#include "..\inc\LPF.h"
 #include "..\inc\Reflectance.h"
-#include "../inc/TA3InputCapture.h"
-#include "../inc/Tachometer.h"
+#include "..\inc\TA3InputCapture.h"
+#include "..\inc\Tachometer.h"
 
 #define P2_4 (*((volatile uint8_t *)(0x42098070)))
 #define P2_3 (*((volatile uint8_t *)(0x4209806C)))
@@ -68,13 +68,23 @@ policies, either expressed or implied, of the FreeBSD Project.
 
 
 void RSLK_Reset(void){
-    DisableInterrupts();
-
     LaunchPad_Init();
     //Initialise modules used e.g. Reflectance Sensor, Bump Switch, Motor, Tachometer etc
     // ... ...
-
+    DisableInterrupts();
+    Clock_Init48MHz(); // makes SMCLK=12 MHz
+    //SysTick_Init();
+    SysTick_Init(48000,2);  // set up SysTick for 1000 Hz interrupts
+    Motor_Init();
+    // Motor_Stop();
+    LaunchPad_Init();
+    Bump_Init();
+    //BumpInt_Init();
+    //IRSensor_Init();
+    Tachometer_Init();
+    EUSCIA0_Init(); // initialize UART
     EnableInterrupts();
+
 }
 
 // RSLK Self-Test
@@ -82,19 +92,23 @@ void RSLK_Reset(void){
 // Only one entry (RSLK_Reset) is coded in the switch case. Fill up with other menu entries required for Lab5 assessment.
 // Init function to various peripherals are commented off.  For reference only. Not the complete list.
 
+volatile uint8_t reflectance_data, bump_data;
+
 int main(void) {
   uint32_t cmd=0xDEAD, menu=0;
 
   DisableInterrupts();
   Clock_Init48MHz();  // makes SMCLK=12 MHz
-  //SysTick_Init(48000,2);  // set up SysTick for 1000 Hz interrupts
-  //Motor_Init();
+  SysTick_Init(48000,2);  // set up SysTick for 1000 Hz interrupts
+  //SysTick_Init();
+  Motor_Init();
   //Motor_Stop();
   LaunchPad_Init();
-  //Bump_Init();
-  //Bumper_Init();
+  Bump_Init();
+  Reflectance_Init();
+  //BumpInt_Init();
   //IRSensor_Init();
-  //Tachometer_Init();
+  Tachometer_Init();
   EUSCIA0_Init();     // initialize UART
   EnableInterrupts();
 
@@ -122,7 +136,54 @@ int main(void) {
 
               // ....
               // ....
+          case 6: {
+                  uint8_t bump_val;
+                  uint8_t bump_val_hex;
+                  EUSCIA0_OutString("Press any bump switch (press all to exit)\r\n");
+                  while (1) {
+                      bump_val = Bump_Read(); // or BumpInt_Read() if using interrupts
+                      bump_val_hex = Bump_Read();
+                      if (bump_val != 0x3F) { // 0x3F means no bump pressed (all bits high)
+                          EUSCIA0_OutString("Bump value: ");
+                          EUSCIA0_OutUDec(bump_val); // print decimal
+                          EUSCIA0_OutString(" (0x");
 
+                          uint32_t dec_value = 0;
+                          for (int i=0; i<=7;i++){
+                              dec_value += (bump_val & 0x01) * (1 << i);// 1<<i is 2**i
+                              bump_val = bump_val >> 1;
+                          }
+                          EUSCIA0_OutUDec(dec_value);
+                          char hex_digits[] = "0123456789ABCDEF";
+                          char hex_str[5] = "0xFF";
+                          uint32_t index = 0;
+                          for (int i=0; i<=3;i++){
+                              index += (bump_val_hex & 0x01) * (1 << i);// 1<<i is 2**i
+                              bump_val_hex = bump_val_hex >> 1;
+                          }
+                          hex_str[3] = hex_digits[index];
+                          index = 0;
+                          for (int i=4; i<=7;i++){
+                              index += (bump_val_hex & 0x01) * (1 << i);// 1<<i is 2**i
+                              bump_val_hex = bump_val_hex >> 1;
+                          }
+                          hex_str[2] = hex_digits[index];
+                          EUSCIA0_OutString(hex_str);
+
+
+                          //EUSCIA0_OutUHex(bump_val); // print hex
+                          EUSCIA0_OutString(")\r\n");
+                          //Clock_Delay1ms(500); // debounce delay
+                      }
+                      if (bump_val == 0x00) { // all switches pressed to exit
+                          EUSCIA0_OutString("All bump switches pressed. Exiting...\r\n");
+                          break;
+                      }
+                  }
+                  menu = 1;
+                  cmd = 0xDEAD;
+                  break;
+          }
           default:
               menu=1;
               break;

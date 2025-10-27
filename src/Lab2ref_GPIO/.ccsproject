@@ -14,4 +14,5 @@
 	<templateProperties value="id=com.ti.common.project.core.emptyProjectWithMainTemplate_msp432,"/>
 	<filesToOpen value="main.c,"/>
 	<isTargetManual value="false"/>
+	<origin value="C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/Lab2ref_GPIO"/>
 </projectOptions>

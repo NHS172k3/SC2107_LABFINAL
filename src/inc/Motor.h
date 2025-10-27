@@ -137,4 +137,7 @@ void Motor_Left(uint16_t leftDuty, uint16_t rightDuty);
  */
 void Motor_Backward(uint16_t leftDuty, uint16_t rightDuty);
 
+void Motor_MoveByXmm(int32_t distance, uint16_t speed);
+void Motor_RotateAngle(int16_t angle, uint16_t speed);
+
 #endif /* MOTOR_H_ */

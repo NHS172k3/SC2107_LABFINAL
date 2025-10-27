@@ -28,37 +28,43 @@
 		<link>
 			<name>Clock.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Clock.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Clock.c</locationURI>
 		</link>
 		<link>
 			<name>LaunchPad.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/LaunchPad.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/LaunchPad.c</locationURI>
 		</link>
 		<link>
 			<name>Motor.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Motor.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Motor.c</locationURI>
 		</link>
 		<link>
 			<name>PWM.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/PWM.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/PWM.c</locationURI>
 		</link>
 		<link>
 			<name>Reflectance.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Reflectance.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Reflectance.c</locationURI>
 		</link>
 		<link>
 			<name>TExaS.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/TExaS.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/TExaS.c</locationURI>
 		</link>
 		<link>
 			<name>Tachometer.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/inc/Tachometer.c</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/inc/Tachometer.c</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>ORIGINAL_PROJECT_ROOT</name>
+			<value>file:/C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/LINE_FOLLOWER</value>
+		</variable>
+	</variableList>
 </projectDescription>

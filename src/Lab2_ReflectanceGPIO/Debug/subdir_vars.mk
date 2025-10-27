@@ -9,10 +9,10 @@ CMD_SRCS += \
 ../msp432p401r.cmd 
 
 C_SRCS += \
-C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1\ (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Clock.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Clock.c \
 ../Lab2_GPIOmain.c \
-C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1\ (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Reflectance.c \
-C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1\ (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/TExaS.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Reflectance.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/TExaS.c \
 ../startup_msp432p401r_ccs.c \
 ../system_msp432p401r.c 
 
@@ -49,10 +49,10 @@ C_DEPS__QUOTED += \
 "system_msp432p401r.d" 
 
 C_SRCS__QUOTED += \
-"C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1 (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Clock.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Clock.c" \
 "../Lab2_GPIOmain.c" \
-"C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1 (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Reflectance.c" \
-"C:/Users/R240019/Downloads/SC2107_HARI_2310/SC2107_HARI/SC2107_HARI/endoflab1 (2)/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/TExaS.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Reflectance.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/TExaS.c" \
 "../startup_msp432p401r_ccs.c" \
 "../system_msp432p401r.c" 
 

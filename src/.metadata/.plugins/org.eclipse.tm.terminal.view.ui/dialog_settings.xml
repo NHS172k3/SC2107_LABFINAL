@@ -4,7 +4,7 @@
 		<item value="Serial Terminal" key="terminalLabel"/>
 		<section name="SettingsPanelControl">
 			<section name="Serial Terminal">
-				<item value="COM3" key="SerialLinePanel.selectedTTYDevice.Windows 10"/>
+				<item value="COM4" key="SerialLinePanel.selectedTTYDevice.Windows 10"/>
 				<item value="5" key="SerialLinePanel.selectedTTYTimeout.Windows 10"/>
 				<item value="115200" key="SerialLinePanel.selectedTTYSpeedRate.Windows 10"/>
 				<item value="UTF-8" key="encoding"/>
@@ -14,7 +14,6 @@
 				<item value="None" key="SerialLinePanel.selectedTTYParity.Windows 10"/>
 			</section>
 			<section name="Local Terminal">
-				<item value="UTF-8" key="encoding"/>
 			</section>
 		</section>
 	</section>

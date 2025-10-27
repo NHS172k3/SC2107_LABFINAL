@@ -9,10 +9,10 @@ CMD_SRCS += \
 ../msp432p401r.cmd 
 
 C_SRCS += \
-C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Clock.c \
-C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/LaunchPad.c \
-C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/SysTick.c \
-C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/TExaS.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Clock.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/LaunchPad.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/SysTick.c \
+C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/TExaS.c \
 ../TExaSmain.c \
 ../startup_msp432p401r_ccs.c \
 ../system_msp432p401r.c 
@@ -54,10 +54,10 @@ C_DEPS__QUOTED += \
 "system_msp432p401r.d" 
 
 C_SRCS__QUOTED += \
-"C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/Clock.c" \
-"C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/LaunchPad.c" \
-"C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/SysTick.c" \
-"C:/Users/R240019/Downloads/endoflab1/RSLK-Max-CE2007Labs-students-01062022/CE2007/inc/TExaS.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/Clock.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/LaunchPad.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/SysTick.c" \
+"C:/Users/r240019/Downloads/SC2107_LABFINAL-main/SC2107_LABFINAL-main/src/inc/TExaS.c" \
 "../TExaSmain.c" \
 "../startup_msp432p401r_ccs.c" \
 "../system_msp432p401r.c" 
