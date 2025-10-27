@@ -83,15 +83,15 @@ policies, either expressed or implied, of the FreeBSD Project.
 #define P2_1 (*((volatile uint8_t *)(0x42098064)))
 #define P2_0 (*((volatile uint8_t *)(0x42098060)))
 
-//#define PERIOD 1000  // must be even
+// #define PERIOD 1000  // must be even
 
-uint16_t Period0;              // (1/SMCLK) units = 83.3 ns units
-uint16_t First0=0;             // Timer A3 first edge, P10.4
-uint32_t Done0=0;              // set each rising
+uint16_t Period0;    // (1/SMCLK) units = 83.3 ns units
+uint16_t First0 = 0; // Timer A3 first edge, P10.4
+uint32_t Done0 = 0;  // set each rising
 
-uint16_t Period2;              // (1/SMCLK) units = 83.3 ns units
-uint16_t First2=0;             // Timer A3 first edge, P8.2
-uint32_t Done2=0;              // set each rising
+uint16_t Period2;    // (1/SMCLK) units = 83.3 ns units
+uint16_t First2 = 0; // Timer A3 first edge, P8.2
+uint32_t Done2 = 0;  // set each rising
 
 // new
 volatile uint8_t bumpState;
@@ -102,68 +102,74 @@ int32_t targetSteps = 818;
 extern int Tachometer_LeftSteps;
 extern int Tachometer_RightSteps;
 
-
 // max period is (2^16-1)*83.3 ns = 5.4612 ms
 // min period determined by time to run ISR, which is about 1 us
-void PeriodMeasure0(uint16_t time){
-  Period0 = (time - First0)&0xFFFF; // 16 bits, 83.3 ns resolution
-  First0 = time;                    // setup for next
+void PeriodMeasure0(uint16_t time)
+{
+  Period0 = (time - First0) & 0xFFFF; // 16 bits, 83.3 ns resolution
+  First0 = time;                      // setup for next
   Done0++;
 }
 
 // max period is (2^16-1)*83.3 ns = 5.4612 ms
 // min period determined by time to run ISR, which is about 1 us
-void PeriodMeasure2(uint16_t time){
-  Period2 = (time - First2)&0xFFFF; // 16 bits, 83.3 ns resolution
-  First2 = time;                    // setup for next
+void PeriodMeasure2(uint16_t time)
+{
+  Period2 = (time - First2) & 0xFFFF; // 16 bits, 83.3 ns resolution
+  First2 = time;                      // setup for next
   Done2++;
 }
 
 volatile uint8_t input;
-void TimedPause(uint32_t time){
-  Clock_Delay1ms(time);         // run for a while and stop
+void TimedPause(uint32_t time)
+{
+  Clock_Delay1ms(time); // run for a while and stop
   Motor_Stop();
-  while(LaunchPad_Input()==0) {
-      // wait for touch
-      input = LaunchPad_Input();
+  while (LaunchPad_Input() == 0)
+  {
+    // wait for touch
+    input = LaunchPad_Input();
   }
-  while(LaunchPad_Input());     // wait for release
+  while (LaunchPad_Input())
+    ; // wait for release
 }
 
-uint32_t main_count=0;
+uint32_t main_count = 0;
 
-void main(void){
-    DisableInterrupts();
-    Clock_Init48MHz();  // 48 MHz clock; 12 MHz Timer A clock
-    LaunchPad_Init();   // built-in switches and LEDs
-    UART0_Init();       // initialize UART0 115,200 baud rate
-    Motor_Init();       // configure motor
-    TimerA3Capture_Init(&PeriodMeasure0,&PeriodMeasure2);
-    TimedPause(500);
-    EnableInterrupts();
+void main(void)
+{
+  DisableInterrupts();
+  Clock_Init48MHz(); // 48 MHz clock; 12 MHz Timer A clock
+  LaunchPad_Init();  // built-in switches and LEDs
+  UART0_Init();      // initialize UART0 115,200 baud rate
+  Motor_Init();      // configure motor
+  TimerA3Capture_Init(&PeriodMeasure0, &PeriodMeasure2);
+  TimedPause(500);
+  EnableInterrupts();
 
-    Tachometer_Init();
-    Tachometer_LeftSteps = 0;
-    Tachometer_RightSteps = 0;
-    Motor_Forward(1000,1000);
-    //Motor_RotateAngle(90, 2000);
-    Motor_Stop();
-    while(1){
-//      WaitForInterrupt();
-//      main_count++;
-//      if(main_count%1000 == 0){
-//          UART0_OutString("Period0 = ");UART0_OutUDec5(Period0);UART0_OutString(" Period2 = ");UART0_OutUDec5(Period2);UART0_OutString(" \r\n");
-//      }
+  Tachometer_Init();
+  Tachometer_LeftSteps = 0;
+  Tachometer_RightSteps = 0;
+  Motor_Forward(1000, 1000);
+  // Motor_RotateAngle(90, 2000);
+  Motor_Stop();
+  while (1)
+  {
+    //      WaitForInterrupt();
+    //      main_count++;
+    //      if(main_count%1000 == 0){
+    //          UART0_OutString("Period0 = ");UART0_OutUDec5(Period0);UART0_OutString(" Period2 = ");UART0_OutUDec5(Period2);UART0_OutString(" \r\n");
+    //      }
 
-      Tachometer_Get(&leftTach, &leftDir, &leftSteps, &rightTach, &rightDir, &rightSteps);
-      if (leftSteps >= targetSteps && rightSteps >= targetSteps) {
-          Motor_RotateAngle(90, 1000);
-          Motor_Stop();
-          Clock_Delay1ms(500);
-          Tachometer_LeftSteps = 0;
-          Tachometer_RightSteps = 0;
-          Motor_Forward(1000,1000);
-      }
-
+    Tachometer_Get(&leftTach, &leftDir, &leftSteps, &rightTach, &rightDir, &rightSteps);
+    if (leftSteps >= targetSteps && rightSteps >= targetSteps)
+    {
+      Motor_RotateAngle(90, 1000);
+      Motor_Stop();
+      Clock_Delay1ms(500);
+      Tachometer_LeftSteps = 0;
+      Tachometer_RightSteps = 0;
+      Motor_MoveByXcm(10, 1000);
     }
+  }
 }

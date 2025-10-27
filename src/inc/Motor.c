@@ -73,30 +73,34 @@ policies, either expressed or implied, of the FreeBSD Project.
 // control is uninitialized.
 // Input: none
 // Output: none
-void Motor_Init(void){
-  // write this as part of Lab 3
+void Motor_Init(void)
+{
+    // write this as part of Lab 3
+    // Motor enable pins
     P3->SEL0 &= ~0xC0;
-    P3->SEL1 &= ~0xC0;    // 1) configure P1.6, 1.7 as GPIO
-    P3->DIR |= 0xC0;      // 2) make P1.6, 1.7 output
-    P3->OUT &= ~0xC0;     // 3) output LOW
-#if (RSLK_MAX==0)
+    P3->SEL1 &= ~0xC0; // 1) configure P1.6, 1.7 as GPIO
+    P3->DIR |= 0xC0;   // 2) make P1.6, 1.7 output
+    P3->OUT &= ~0xC0;  // 3) output LOW
+
+// Motor direction pins
+#if (RSLK_MAX == 0)
     P1->SEL0 &= ~0xC0;
-    P1->SEL1 &= ~0xC0;    // 1) configure P1.6, 1.7 as GPIO
-    P1->DIR |= 0xC0;      // 2) make P1.6, 1.7 output
-    P1->OUT &= ~0xC0;     // 3) output LOW
+    P1->SEL1 &= ~0xC0; // 1) configure P1.6, 1.7 as GPIO
+    P1->DIR |= 0xC0;   // 2) make P1.6, 1.7 output
+    P1->OUT &= ~0xC0;  // 3) output LOW
 #else
     P5->SEL0 &= ~0x30;
-    P5->SEL1 &= ~0x30;    // 1) configure P5.5, 5.4 as GPIO
-    P5->DIR |= 0x30;      // 2) make P5.5, 5.4 output
-    P5->OUT &= ~0x30;     // 3) output LOW
+    P5->SEL1 &= ~0x30; // 1) configure P5.5, 5.4 as GPIO
+    P5->DIR |= 0x30;   // 2) make P5.5, 5.4 output
+    P5->OUT &= ~0x30;  // 3) output LOW
 #endif
+    // Motor PWM pins for speed control
     P2->SEL0 &= ~0xC0;
-    P2->SEL1 &= ~0xC0;    // 1) configure P1.6, 1.7 as GPIO
-    P2->DIR |= 0xC0;      // 2) make P1.6, 1.7 output
-    P2->OUT &= ~0xC0;     // 3) output LOW
-  
-    PWM_Init34(PERIOD, 0, 0);
+    P2->SEL1 &= ~0xC0; // 1) configure P1.6, 1.7 as GPIO
+    P2->DIR |= 0xC0;   // 2) make P1.6, 1.7 output
+    P2->OUT &= ~0xC0;  // 3) output LOW
 
+    PWM_Init34(PERIOD, 0, 0);
 }
 
 // ------------Motor_Stop------------
@@ -104,10 +108,11 @@ void Motor_Init(void){
 // set the PWM speed control to 0% duty cycle.
 // Input: none
 // Output: none
-void Motor_Stop(void){
-  // write this as part of Lab 3
-    P2->OUT &= ~0xC0;   // off
-    P3->OUT &= ~0xC0;   // low current sleep mode
+void Motor_Stop(void)
+{
+    // write this as part of Lab 3
+    P2->OUT &= ~0xC0; // off
+    P3->OUT &= ~0xC0; // low current sleep mode
     PWM_Duty3(0);
     PWM_Duty4(0);
 }
@@ -120,11 +125,12 @@ void Motor_Stop(void){
 //        rightDuty duty cycle of right wheel (0 to 14,998)
 // Output: none
 // Assumes: Motor_Init() has been called
-void Motor_Forward(uint16_t leftDuty, uint16_t rightDuty){ 
-  // write this as part of Lab 3
+void Motor_Forward(uint16_t leftDuty, uint16_t rightDuty)
+{
+    // write this as part of Lab 3
 
     // Forward direction
-#if (RSLK_MAX==0)
+#if (RSLK_MAX == 0)
     P1->OUT &= ~0xC0;
 #else
     P5->OUT &= ~0x30;
@@ -133,9 +139,8 @@ void Motor_Forward(uint16_t leftDuty, uint16_t rightDuty){
     PWM_Duty3(leftDuty);
     PWM_Duty4(rightDuty);
 
-    //Enable L and R motor
+    // Enable L and R motor
     P3->OUT |= 0xC0;
-  
 }
 
 // ------------Motor_Right------------
@@ -146,9 +151,12 @@ void Motor_Forward(uint16_t leftDuty, uint16_t rightDuty){
 //        rightDuty duty cycle of right wheel (0 to 14,998)
 // Output: none
 // Assumes: Motor_Init() has been called
-void Motor_Right(uint16_t leftDuty, uint16_t rightDuty){ 
-  // write this as part of Lab 3
+void Motor_Right(uint16_t leftDuty, uint16_t rightDuty)
+{
+    // write this as part of Lab 3
     // Right direction
+// 1. P5.4 = LOW  → Left motor forward
+// 2. P5.5 = HIGH → Right motor backward
 #if (RSLK_MAX == 0)
     P1->OUT &= ~0x80;
     P1->OUT |= 0x40;
@@ -160,9 +168,8 @@ void Motor_Right(uint16_t leftDuty, uint16_t rightDuty){
     PWM_Duty3(leftDuty);
     PWM_Duty4(rightDuty);
 
-    //Enable L and R motor
+    // Enable L and R motor
     P3->OUT |= 0xC0;
-
 }
 
 // ------------Motor_Left------------
@@ -173,9 +180,14 @@ void Motor_Right(uint16_t leftDuty, uint16_t rightDuty){
 //        rightDuty duty cycle of right wheel (0 to 14,998)
 // Output: none
 // Assumes: Motor_Init() has been called
-void Motor_Left(uint16_t leftDuty, uint16_t rightDuty){ 
-  // write this as part of Lab 3
+void Motor_Left(uint16_t leftDuty, uint16_t rightDuty)
+{
+    // write this as part of Lab 3
     // Right direction
+
+    // 1. P5.4 = HIGH → Left motor backward
+    // 2. P5.5 = LOW  → Right motor forward
+
 #if (RSLK_MAX == 0)
     P1->OUT &= ~0x40;
     P1->OUT |= 0x80;
@@ -186,9 +198,8 @@ void Motor_Left(uint16_t leftDuty, uint16_t rightDuty){
     PWM_Duty3(leftDuty);
     PWM_Duty4(rightDuty);
 
-    //Enable L and R motor
+    // Enable L and R motor
     P3->OUT |= 0xC0;
-
 }
 
 // ------------Motor_Backward------------
@@ -199,10 +210,11 @@ void Motor_Left(uint16_t leftDuty, uint16_t rightDuty){
 //        rightDuty duty cycle of right wheel (0 to 14,998)
 // Output: none
 // Assumes: Motor_Init() has been called
-void Motor_Backward(uint16_t leftDuty, uint16_t rightDuty){ 
-  // write this as part of Lab 3
-    // Backward direction
-#if (RSLK_MAX==0)
+void Motor_Backward(uint16_t leftDuty, uint16_t rightDuty)
+{
+    // write this as part of Lab 3
+    // Backward direction for both motors
+#if (RSLK_MAX == 0)
     P1->OUT |= 0xC0;
 #else
     P5->OUT |= 0x30;
@@ -210,22 +222,21 @@ void Motor_Backward(uint16_t leftDuty, uint16_t rightDuty){
     PWM_Duty3(leftDuty);
     PWM_Duty4(rightDuty);
 
-    //Enable L and R motor
+    // Enable L and R motor
     P3->OUT |= 0xC0;
-
 }
 
 // by aloy
 // At the top of Motor.c, add these defines and extern declarations:
 #include <stdlib.h> // for abs()
 // Robot physical parameters (adjust these based on your robot measurements)
-#define WHEELBASE 140          // Distance between wheels in mm
+#define WHEELBASE 140           // Distance between wheels in mm
 #define WHEEL_CIRCUMFERENCE 220 // Wheel circumference in mm (from Tachometer.h: 360 steps per 220mm)
 
 // External references to tachometer step counters
+// extern is used because these variables are defined in another file
 extern int Tachometer_LeftSteps;
 extern int Tachometer_RightSteps;
-
 
 // Then add this function implementation:
 
@@ -233,40 +244,98 @@ extern int Tachometer_RightSteps;
  * Rotate the robot by a specified angle
  * This function uses differential drive: one wheel forward, one backward
  */
-void Motor_RotateAngle(int16_t angle, uint16_t speed) {
+void Motor_RotateAngle(int16_t angle, uint16_t speed)
+{
     uint32_t targetSteps;
     int32_t leftSteps, rightSteps;
 
     // Return immediately if angle is 0
-    if (angle == 0) {
+    if (angle == 0)
+    {
         return;
     }
 
-    // Calculate number of steps needed for this rotation
+    // Calculate number of steps where each step is (wheelbase * PI * abs(angle)) / wheel_circumference
     // Formula: steps = (wheelbase * PI * abs(angle)) / wheel_circumference
-    targetSteps = (uint32_t)((WHEELBASE * 3.14159 * abs(angle)) / WHEEL_CIRCUMFERENCE);
+    // Out of the circle that the robot makes when it turns, each wheel travels a distance proportional to the angle of rotation.
+    ''' Robot specifications : -WHEELBASE = 140 mm(distance between left and right wheels) - WHEEL_CIRCUMFERENCE = 220 mm(one wheel rotation) - 360 encoder steps per wheel rotation
 
-    // Reset tachometer step counters
-    Tachometer_LeftSteps = 0;
+        To turn 90 degrees : 1. Calculate arc length each wheel travels : Arc = (wheelbase × π × angle) / 360° Arc = (140 × π × 90) / 360 Arc = (140 × 3.14159 × 90) / 360 Arc = 109.96 mm
+
+                                                                          2. Convert mm to encoder steps : Steps = Arc / (Circumference / 360) // essentially, how much degrees of wheel turn u need to get the distance
+                                                                                                                   Steps = Arc / 0.611 mm per step
+                                                                                                                                     Steps = 109.96 / 0.611 Steps ≈ 180 steps
+
+                                                                                                                                                          Wait,
+                                                                          but formula in code : targetSteps = (140 × 3.14159 × 90) / 220 targetSteps = 39, 584.6 / 220 targetSteps ≈ 180 steps 
+   ''' targetSteps = (uint32_t)((WHEELBASE * 3.14159 * abs(angle)) / WHEEL_CIRCUMFERENCE);
+
+                                                                                                                                                               // Reset tachometer step counters
+                                                                                                                                                               Tachometer_LeftSteps = 0;
     Tachometer_RightSteps = 0;
 
     // Start rotation based on direction
-    if (angle > 0) {
+    if (angle > 0)
+    {
         // Clockwise rotation (turn right)
-        Motor_Left(-speed, speed);   // Left motor backward, right motor forward
+        Motor_Left(-speed, speed); // Left motor backward, right motor forward
         Motor_Right(speed, speed);
-    } else {
+    }
+    else
+    {
         // Counter-clockwise rotation (turn left)
-        Motor_Left(speed, speed);    // Left motor forward, right motor backward
+        Motor_Left(speed, speed); // Left motor forward, right motor backward
         Motor_Right(-speed, speed);
     }
 
     // Wait until target steps reached on both wheels
     // Use abs() because steps can be negative depending on direction
-    do {
+    do
+    {
         leftSteps = Tachometer_LeftSteps;
         rightSteps = Tachometer_RightSteps;
     } while (abs(leftSteps) < targetSteps && abs(rightSteps) < targetSteps);
+
+    // Stop motors
+    Motor_Stop();
+}
+
+void Motor_MoveByXcm(int32_t distance, uint16_t speed)
+{
+    uint32_t targetSteps;
+    int32_t leftSteps, rightSteps;
+
+    // Return immediately if distance is 0
+    if (distance == 0)
+    {
+        return;
+    }
+
+    // Calculate number of steps
+    targetSteps = (uint32_t)((distance * 360) / WHEEL_CIRCUMFERENCE);
+
+    // Reset tachometer step counters
+    Tachometer_LeftSteps = 0;
+    Tachometer_RightSteps = 0;
+
+    // Start movement based on direction
+    if (distance > 0)
+    {
+        // Move forward
+        Motor_Forward(speed, speed);
+    }
+    else
+    {
+        // Move backward
+        Motor_Backward(speed, speed);
+    }
+
+    // Wait until target steps reached on both wheels
+    do
+    {
+        leftSteps = abs(Tachometer_LeftSteps);
+        rightSteps = abs(Tachometer_RightSteps);
+    } while (leftSteps < targetSteps && rightSteps < targetSteps);
 
     // Stop motors
     Motor_Stop();

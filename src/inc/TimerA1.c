@@ -46,7 +46,7 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include <stdint.h>
 #include "msp.h"
 
-void (*TimerA1Task)(void);   // user function
+void (*TimerA1Task)(void); // user function
 
 // ***************** TimerA1_Init ****************
 // Activate Timer A1 interrupts to run user task periodically
@@ -54,10 +54,11 @@ void (*TimerA1Task)(void);   // user function
 //          period in units (24/SMCLK), 16 bits
 // SMCLK = 12Mhz
 // Outputs: none
-void TimerA1_Init(void(*task)(void), uint16_t period){
+void TimerA1_Init(void (*task)(void), uint16_t period)
+{
 
-    TimerA1Task = task;             // user function
-    TIMER_A1->CTL &= ~0x0030;       // halt Timer A1
+    TimerA1Task = task;       // user function
+    TIMER_A1->CTL &= ~0x0030; // halt Timer A1
     // bits15-10=XXXXXX, reserved
     // bits9-8=10,       clock source to SMCLK
     // bits7-6=10,       input clock divider /4
@@ -79,29 +80,29 @@ void TimerA1_Init(void(*task)(void), uint16_t period){
     // bit1=X,           capture overflow status
     // bit0=0,           clear capture/compare interrupt pending
     TIMER_A1->CCTL[0] = 0x0010;
-    TIMER_A1->CCR[0] = (period - 1);   // compare match value
-    TIMER_A1->EX0 = 0x0005;    // configure for input clock divider /6
-  // interrupts enabled in the main program after all devices initialized
+    TIMER_A1->CCR[0] = (period - 1); // compare match value
+    TIMER_A1->EX0 = 0x0005;          // configure for input clock divider /6
+                                     // interrupts enabled in the main program after all devices initialized
     // priority 2 -> Pg 122 slau356. Only Upper 3 bits are recognised => 0x40 = priority 2 //OHL
-    NVIC->IP[2] = (NVIC->IP[2]&0xFF00FFFF)|0x00400000;
+    NVIC->IP[2] = (NVIC->IP[2] & 0xFF00FFFF) | 0x00400000;
     // enable interrupt 10 (LSB is interrupt 0) in NVIC -> pg118 MSP432 datasheets //OHL
     NVIC->ISER[0] = 0x00000400;
-    TIMER_A1->CTL |= 0x0014;      // reset and start Timer A1 in up mode
+    TIMER_A1->CTL |= 0x0014; // reset and start Timer A1 in up mode
 }
-
 
 // ------------TimerA1_Stop------------
 // Deactivate the interrupt running a user task periodically.
 // Input: none
 // Output: none
-void TimerA1_Stop(void){
+void TimerA1_Stop(void)
+{
 
-    TIMER_A1->CTL &= ~0x0030;       // halt Timer A2
-    NVIC->ICER[0] = 0x00001000;     // disable interrupt 12 in NVIC
+    TIMER_A1->CTL &= ~0x0030;   // halt Timer A1
+    NVIC->ICER[0] = 0x00001000; // disable interrupt 10 in NVIC
 }
 
-
-void TA1_0_IRQHandler(void){
+void TA1_0_IRQHandler(void)
+{
 
     TIMER_A1->CCTL[0] &= ~0x0001; // acknowledge capture/compare interrupt 0
     (*TimerA1Task)();             // execute user task

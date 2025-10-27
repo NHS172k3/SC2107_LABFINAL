@@ -83,56 +83,69 @@ policies, either expressed or implied, of the FreeBSD Project.
 #define P2_1 (*((volatile uint8_t *)(0x42098064)))
 #define P2_0 (*((volatile uint8_t *)(0x42098060)))
 
-//#define PERIOD 1000  // must be even
+// #define PERIOD 1000  // must be even
 
-uint16_t Period0;              // (1/SMCLK) units = 83.3 ns units
-uint16_t First0=0;             // Timer A3 first edge, P10.4
-uint32_t Done0=0;              // set each rising
+uint16_t Period0;    // (1/SMCLK) units = 83.3 ns units
+uint16_t First0 = 0; // Timer A3 first edge, P10.4
+uint32_t Done0 = 0;  // set each rising
 
-uint16_t Period2;              // (1/SMCLK) units = 83.3 ns units
-uint16_t First2=0;             // Timer A3 first edge, P8.2
-uint32_t Done2=0;              // set each rising
+uint16_t Period2;    // (1/SMCLK) units = 83.3 ns units
+uint16_t First2 = 0; // Timer A3 first edge, P8.2
+uint32_t Done2 = 0;  // set each rising
 
 // max period is (2^16-1)*83.3 ns = 5.4612 ms
 // min period determined by time to run ISR, which is about 1 us
-void PeriodMeasure0(uint16_t time){
-  Period0 = (time - First0)&0xFFFF; // 16 bits, 83.3 ns resolution
-  First0 = time;                    // setup for next
+void PeriodMeasure0(uint16_t time)
+{                                     // right wheel pulsing interrupts and calls this
+  Period0 = (time - First0) & 0xFFFF; // 16 bits, 83.3 ns resolution
+  First0 = time;                      // setup for next
   Done0++;
 }
 
 // max period is (2^16-1)*83.3 ns = 5.4612 ms
 // min period determined by time to run ISR, which is about 1 us
-void PeriodMeasure2(uint16_t time){
-  Period2 = (time - First2)&0xFFFF; // 16 bits, 83.3 ns resolution
-  First2 = time;                    // setup for next
+void PeriodMeasure2(uint16_t time)
+{                                     // left wheel pulsing
+  Period2 = (time - First2) & 0xFFFF; // 16 bits, 83.3 ns resolution
+  First2 = time;                      // setup for next
   Done2++;
 }
 
-void TimedPause(uint32_t time){
-  Clock_Delay1ms(time);         // run for a while and stop
+void TimedPause(uint32_t time)
+{
+  Clock_Delay1ms(time); // run for a while and stop
   Motor_Stop();
-  while(LaunchPad_Input()==0);  // wait for touch
-  while(LaunchPad_Input());     // wait for release
+  while (LaunchPad_Input() == 0)
+    ; // wait for touch
+  while (LaunchPad_Input())
+    ; // wait for release
 }
 
-uint32_t main_count=0;
+uint32_t main_count = 0;
 
-void main(void){
-    DisableInterrupts();
-    Clock_Init48MHz();  // 48 MHz clock; 12 MHz Timer A clock
-    LaunchPad_Init();   // built-in switches and LEDs
-    UART0_Init();       // initialize UART0 115,200 baud rate
-    Motor_Init();       // configure motor
-    TimerA3Capture_Init(&PeriodMeasure0,&PeriodMeasure2);
-    TimedPause(500);
-    Motor_Forward(3000,3000);
-    EnableInterrupts();
-    while(1){
-      WaitForInterrupt();
-      main_count++;
-      if(main_count%1000){
-          UART0_OutString("Period0 = ");UART0_OutUDec5(Period0);UART0_OutString(" Period2 = ");UART0_OutUDec5(Period2);UART0_OutString(" \r\n");
-      }
+void main(void)
+{
+  DisableInterrupts();
+  Clock_Init48MHz(); // 48 MHz clock; 12 MHz Timer A clock
+  LaunchPad_Init();  // built-in switches and LEDs
+  UART0_Init();      // initialize UART0 115,200 baud rate
+  Motor_Init();      // configure motor
+  // input to the functions are time and the outputs are automatically updated
+  TimerA3Capture_Init(&PeriodMeasure0, &PeriodMeasure2);
+  TimedPause(500);
+  Motor_Forward(3000, 3000);
+  EnableInterrupts();
+  while (1)
+  {
+    WaitForInterrupt();
+    main_count++;
+    if (main_count % 1000)
+    {
+      UART0_OutString("Period0 = ");
+      UART0_OutUDec5(Period0);
+      UART0_OutString(" Period2 = ");
+      UART0_OutUDec5(Period2);
+      UART0_OutString(" \r\n");
     }
+  }
 }

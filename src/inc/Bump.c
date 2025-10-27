@@ -52,62 +52,32 @@ policies, either expressed or implied, of the FreeBSD Project.
 
 #include <stdint.h>
 #include "msp.h"
-#include "motor.h"
-#include "PWM.h"
-
 
 // Initialize Bump sensors
 // Make six Port 4 pins inputs
 // Activate interface pullup
 // pins 7,6,5,3,2,0
+
+volatile uint8_t BumpCollision; // bump interrupt flag
 void (*Port4Task)(uint8_t);
-void PORT4_IRQHandler(void) {
-    // Step 1: Clear interrupt flags to prevent re-triggering
-    P4->IFG &= 0x12;  // Clear flags for Bump0, Bump1, Bump2, Bump3, Bump4, Bump5
+// ISR - ONLY sets flag and reads sensors (FAST!)
+void PORT4_IRQHandler(void)
+{
+    // Step 1: Clear interrupt flags
+    P4->IFG &= 0x12;
 
-    //-----------------------------------------PORTION TO BE UNCOMMENTED FOR BUMP_AVOIDANCE--------------------------------------------------------
-    // Step 2: Read the bump switch states
-    uint8_t bumpStatus = Bump_Read();  // Get the current state of the bump switches
+    // Step 2: Read bump sensors and SET FLAG
+    BumpCollision = Bump_Read(); // Store collision pattern
 
-    // Speed value for normal movement (scaled to 1500 for normal speed)
-    const uint32_t normalSpeed = 1500;  // Normal speed (set to 1500 as per your request)
-
-    // Step 3: React to which bump switches are pressed
-    if (bumpStatus == 0x3F) {
-        // No bump switches pressed
-        Motor_Forward(normalSpeed, normalSpeed);  // Move forward if no bumps are detected
+    // Step 3: Optionally call user task
+    if (Port4Task)
+    {
+        Port4Task(BumpCollision); // User can handle it
     }
-    else {
-        // Step 4: Reverse the robot for a short duration
-        Motor_Backward(normalSpeed, normalSpeed);  // Reverse at normal speed (1500)
-        Clock_Delay1ms(500);                      // Delay to allow for a small reverse (500 ms)
-        Motor_Stop();                             // Stop the robot before turning
-
-        // Step 5: Turn the robot to avoid the obstacle
-        if (!((bumpStatus & 0x01) && (bumpStatus & 0x02)))  {
-            // Bumps on the right side (Bump0, Bump1)
-            Motor_Left(normalSpeed, normalSpeed);  // Turn left to avoid the right-side obstacles
-            Clock_Delay1ms(750);                  // 750ms is 90 degrees
-        }
-        else if (!((bumpStatus & 0x10) && (bumpStatus & 0x20))) {
-            // Bumps on the left side (Bump4, Bump5)
-            Motor_Right(normalSpeed, normalSpeed);  // Turn right to avoid the left-side obstacles
-            Clock_Delay1ms(750);                   // Turn for 1000 ms (adjust as needed)
-        }
-        else if (!((bumpStatus & 0x04) && (bumpStatus & 0x08))) {
-            // Center collision (Bump2, Bump3 pressed)
-            Motor_Left(normalSpeed, normalSpeed);  // Turn left sharply to avoid a front collision
-            Clock_Delay1ms(750);                  // Turn for a longer duration if it's a center collision
-        }
-        else {
-            // If no recognized pattern, just move forward again
-            Motor_Forward(normalSpeed, normalSpeed);
-        }
-    }
-
 }
 
-void Bump_Init(void (*task)(uint8_t)){
+void Bump_Init(void (*task)(uint8_t))
+{
     // write this as part of Lab 3
     // Initialise GPIO related registers.
     // Registers: SEL0, SEL1, DIR, REN, OUT.
@@ -121,7 +91,7 @@ void Bump_Init(void (*task)(uint8_t)){
     P4->IES |= 0xED;
     P4->IFG &= 0x12;
     NVIC->ISER[1] = 0x40;
-    NVIC->IP[9] = (NVIC->IP[9]&0xFF00FFFF)|0x40000000; // priority 2
+    NVIC->IP[9] = (NVIC->IP[9] & 0xFF00FFFF) | 0x40000000; // priority 2
 }
 // Read current state of 6 switches
 // Returns a 6-bit positive logic result (0 to 63)
@@ -131,7 +101,8 @@ void Bump_Init(void (*task)(uint8_t)){
 // bit 2 Bump2
 // bit 1 Bump1
 // bit 0 Bump0
-uint8_t Bump_Read(void){
+uint8_t Bump_Read(void)
+{
     // write this as part of Lab 3
     // Pack the 6 valid bits in the value read from the input data
     // register to occupy 6 lower order bits of the result variable.
@@ -140,17 +111,21 @@ uint8_t Bump_Read(void){
     uint32_t bitval = 0;
     inter = P4->IN;
     uint32_t position = 0;
-    uint32_t i=0;
-    for (i=0; i<8; i++){
-        if (i!=1 && i!=4){
+    uint32_t i = 0;
+    for (i = 0; i < 8; i++)
+    {
+        if (i != 1 && i != 4)
+        {
             bitval = inter & 0x01;
-            if (bitval == 1){
+            if (bitval == 1)
+            {
                 result |= (1 << position);
             }
-            else{
+            else
+            {
                 result &= ~(1 << position);
             }
-            position = position +1;
+            position = position + 1;
         }
         inter = inter >> 1;
     }
@@ -158,4 +133,3 @@ uint8_t Bump_Read(void){
     result &= ~(1 << 7);
     return (result);
 }
-

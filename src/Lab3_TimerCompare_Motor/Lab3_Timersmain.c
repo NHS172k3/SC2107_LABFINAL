@@ -67,22 +67,26 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "..\inc\TExaS.h"
 #include "..\inc\Reflectance.h"
 
-
 volatile uint8_t reflectance_data, bump_data;
 
 // Driver test
-void TimedPause(uint32_t time){
-  Clock_Delay1ms(time);          // run for a while and stop
+// TimedPause tries to add switch input to pause function
+void TimedPause(uint32_t time)
+{
+  Clock_Delay1ms(time); // run for a while and stop
   Motor_Stop();
-  while(LaunchPad_Input()==0);  // wait for touch
-  while(LaunchPad_Input());     // wait for release
+  while (LaunchPad_Input() == 0)
+    ; // wait for touch
+  while (LaunchPad_Input())
+    ; // wait for release
 }
 
 // Test of Periodic interrupt
 #define REDLED (*((volatile uint8_t *)(0x42098060)))
 #define BLUELED (*((volatile uint8_t *)(0x42098068)))
 uint32_t Time;
-void Task(void){
+void Task(void)
+{
 #if 0
   REDLED ^= 0x01;       // toggle P2.0
   REDLED ^= 0x01;       // toggle P2.0
@@ -91,48 +95,54 @@ void Task(void){
 #endif
 
 #if 1
-  volatile static uint8_t count=0;
+  volatile static uint8_t count = 0;
 
   count++;
-  if(count==10)count=0;
+  if (count == 10)
+    count = 0;
 
-  if(Bump_Read()!=0x3F){
-      P3->OUT &= ~0xC0;   // low current sleep mode
+  if (Bump_Read() != 0x3F)
+  {
+    P3->OUT &= ~0xC0; // low current sleep mode
   }
-  else{
-      P3->OUT |= 0xC0;   // Wake up motor
+  else
+  {
+    P3->OUT |= 0xC0; // Wake up motor
   }
 
 #endif
 }
 
-int main(void){
-    // Uses Timer generated PWM to move the robot
-    // Uses TimerA1 to periodically
-    // check the bump switches, stopping the robot on a collision
+int main(void)
+{
+  // Uses Timer generated PWM to move the robot
+  // Uses TimerA1 to periodically
+  // check the bump switches, stopping the robot on a collision
 
-    Clock_Init48MHz();
-    LaunchPad_Init(); // built-in switches and LEDs
-    Bump_Init();      // bump switches
-    Motor_Init();     // your function
-    TExaS_Init(LOGICANALYZER_P2);
-    TimerA1_Init(&Task,50000);  // 10 Hz
-    EnableInterrupts();
+  Clock_Init48MHz();
+  LaunchPad_Init(); // built-in switches and LEDs
+  Bump_Init();      // bump switches
+  Motor_Init();     // your function
+  TExaS_Init(LOGICANALYZER_P2);
+  TimerA1_Init(&Task, 50000); // 10 Hz
+  //&Task is the address of the task to be run in this file and it runs every 0.1s
+  // Task will check the bump sensors and put the motors to sleep if any are pressed
+  EnableInterrupts();
 
-    //TimedPause(1000);
-    while(1){
-      Motor_Forward(3000,3000);  // your function
-      //TimedPause(1000);
-      Clock_Delay1ms(1000);
-      Motor_Backward(3000,3000); // your function
-      //TimedPause(1000);
-      Clock_Delay1ms(1000);
-      Motor_Left(3000,3000);     // your function
-      //TimedPause(1000);
-      Clock_Delay1ms(1000);
-      Motor_Right(3000,3000);    // your function
-      //TimedPause(1000);
-      Clock_Delay1ms(1000);
-    }
+  // TimedPause(1000);
+  while (1)
+  {
+    Motor_Forward(3000, 3000); // your function
+    // TimedPause(1000);
+    Clock_Delay1ms(1000);
+    Motor_Backward(3000, 3000); // your function
+    // TimedPause(1000);
+    Clock_Delay1ms(1000);
+    Motor_Left(3000, 3000); // your function
+    // TimedPause(1000);
+    Clock_Delay1ms(1000);
+    Motor_Right(3000, 3000); // your function
+    // TimedPause(1000);
+    Clock_Delay1ms(1000);
+  }
 }
-

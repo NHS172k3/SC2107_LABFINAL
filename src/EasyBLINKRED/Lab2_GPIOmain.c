@@ -60,18 +60,21 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "..\inc\Clock.h"
 #include "..\inc\TExaS.h"
 #include "..\inc\launchpad.h"
-uint8_t Data; // QTR-8RC
+uint8_t Data;     // QTR-8RC
 int32_t Position; // 332 is right, and -332 is left of center
-int main(void){
+int main(void)
+{
   Clock_Init48MHz();
   Reflectance_Init();
   TExaS_Init(LOGICANALYZER_P7);
-  while(1){
+  while (1)
+  {
     Data = Reflectance_Read(1000);
-    //Data = Reflectance_Center(1000);
-    Position = Reflectance_Position(Data);
     Clock_Delay1ms(10);
+    if (Data & 0x01)
+    {
+      LaunchPad_LED(1);
+    }
+    LaunchPad_LED(0);
   }
 }
-
-

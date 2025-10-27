@@ -59,35 +59,55 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "msp.h"
 #include "Tachometer.h"
 
-uint16_t Tachometer_FirstRightTime, Tachometer_SecondRightTime;
-uint16_t Tachometer_FirstLeftTime, Tachometer_SecondLeftTime;
-int Tachometer_RightSteps = 0;     // incremented with every step forward; decremented with every step backward
-int Tachometer_LeftSteps = 0;      // incremented with every step forward; decremented with every step backward
+uint16_t Tachometer_FirstRightTime, Tachometer_SecondRightTime; // Time of first and second rising edge of right encoder A signal
+uint16_t Tachometer_FirstLeftTime, Tachometer_SecondLeftTime;   // Time of first and second rising edge of left encoder A signal
+int Tachometer_RightSteps = 0;                                  // incremented with every step forward; decremented with every step backward
+int Tachometer_LeftSteps = 0;                                   // incremented with every step forward; decremented with every step backward
+// DIRECTION TRACKING
 enum TachDirection Tachometer_RightDir = STOPPED;
 enum TachDirection Tachometer_LeftDir = STOPPED;
 
-void tachometerRightInt(uint16_t currenttime){
+// Direction values:
+// STOPPED  = 0
+// FORWARD  = 1
+// REVERSE  = 2
+
+/*
+Below interrupt handlers do:
+  1) Record the time of the most recent two rising edges of the A signal
+  2) Read the B signal to determine direction of rotation
+  3) Increment or decrement step count based on direction
+*/
+void tachometerRightInt(uint16_t currenttime)
+{
   Tachometer_FirstRightTime = Tachometer_SecondRightTime;
   Tachometer_SecondRightTime = currenttime;
-  if((P10->IN&0x20) == 0){
+  if ((P10->IN & 0x20) == 0)
+  {
     // Encoder B is low, so this is a step backward
     Tachometer_RightSteps = Tachometer_RightSteps - 1;
     Tachometer_RightDir = REVERSE;
-  }else{
+  }
+  else
+  {
     // Encoder B is high, so this is a step forward
     Tachometer_RightSteps = Tachometer_RightSteps + 1;
     Tachometer_RightDir = FORWARD;
   }
 }
 
-void tachometerLeftInt(uint16_t currenttime){
+void tachometerLeftInt(uint16_t currenttime)
+{
   Tachometer_FirstLeftTime = Tachometer_SecondLeftTime;
   Tachometer_SecondLeftTime = currenttime;
-  if((P9->IN&0x04) == 0){
+  if ((P9->IN & 0x04) == 0)
+  {
     // Encoder B is low, so this is a step backward
     Tachometer_LeftSteps = Tachometer_LeftSteps - 1;
     Tachometer_LeftDir = REVERSE;
-  }else{
+  }
+  else
+  {
     // Encoder B is high, so this is a step backward
     Tachometer_LeftSteps = Tachometer_LeftSteps + 1;
     Tachometer_LeftDir = FORWARD;
@@ -101,15 +121,18 @@ void tachometerLeftInt(uint16_t currenttime){
 // will be used to measure the speed of rotation.
 // Input: none
 // Output: none
-void Tachometer_Init(void){
+void Tachometer_Init(void)
+{
   // initialize P9.2 and make it GPIO
   P9->SEL0 &= ~0x04;
-  P9->SEL1 &= ~0x04;               // configure P9.2 as GPIO
-  P9->DIR &= ~0x04;                // make P9.2 in
+  P9->SEL1 &= ~0x04; // configure P9.2 as GPIO
+  P9->DIR &= ~0x04;  // make P9.2 in
   // initialize P10.5 and make it GPIO
   P10->SEL0 &= ~0x20;
-  P10->SEL1 &= ~0x20;              // configure P10.5 as GPIO
-  P10->DIR &= ~0x20;               // make P10.5 in
+  P10->SEL1 &= ~0x20; // configure P10.5 as GPIO
+  P10->DIR &= ~0x20;  // make P10.5 in
+  // task0 and task2 are the tachometerRightInt and tachometerLeftInt functions
+  // these interrupts will change the variables defined (setter) while the getter is the tachometer get
   TimerA3Capture_Init(&tachometerRightInt, &tachometerLeftInt);
 }
 
@@ -125,7 +148,8 @@ void Tachometer_Init(void){
 // Assumes: Tachometer_Init() has been called
 // Assumes: Clock_Init48MHz() has been called
 void Tachometer_Get(uint16_t *leftTach, enum TachDirection *leftDir, int32_t *leftSteps,
-                    uint16_t *rightTach, enum TachDirection *rightDir, int32_t *rightSteps){
+                    uint16_t *rightTach, enum TachDirection *rightDir, int32_t *rightSteps)
+{
   *leftTach = (Tachometer_SecondLeftTime - Tachometer_FirstLeftTime);
   *leftDir = Tachometer_LeftDir;
   *leftSteps = Tachometer_LeftSteps;

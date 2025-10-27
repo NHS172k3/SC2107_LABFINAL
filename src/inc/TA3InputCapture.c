@@ -52,9 +52,9 @@ policies, either expressed or implied, of the FreeBSD Project.
 
 #define RSLK_MAX 1
 
-void ta3dummy(uint16_t t){};       // dummy function
-void (*CaptureTask0)(uint16_t time) = ta3dummy;// user function
-void (*CaptureTask2)(uint16_t time) = ta3dummy;// user function
+void ta3dummy(uint16_t t) {};                   // dummy function
+void (*CaptureTask0)(uint16_t time) = ta3dummy; // user function for right wheel
+void (*CaptureTask2)(uint16_t time) = ta3dummy; // user function for left wheel
 
 //------------TimerA3Capture_Init------------
 // Initialize Timer A3 in edge time mode to request interrupts on
@@ -69,26 +69,36 @@ void (*CaptureTask2)(uint16_t time) = ta3dummy;// user function
 // Assumes: low-speed subsystem master clock is 12 MHz
 // P8.2 -> TA3.CCI2A; P10.4 -> TA3.CCI0A
 
-void TimerA3Capture_Init(void(*task0)(uint16_t time), void(*task2)(uint16_t time)){
-  // write this as part of lab 4
-    CaptureTask0 = task0;              // user function, ccr1
-    CaptureTask2 = task2;              // user function, ccr2
-#if (RSLK_MAX==0)
+void TimerA3Capture_Init(void (*task0)(uint16_t time), void (*task2)(uint16_t time))
+{
+    // write this as part of lab 4
+    CaptureTask0 = task0; // user function, ccr1
+    CaptureTask2 = task2; // user function, ccr2
+
+    // CONFIGURE PINS FOR TIMER A3 CAPTURE
+#if (RSLK_MAX == 0)
     // initialize P8.2 and make it input (P8.2 TA3CCI2A)
     P8->SEL0 |= 0x04;
-    P8->SEL1 &= ~0x04;                 // configure P8.2 to TA3CCI2A
-    P8->DIR &= ~0x04;                  // make P8.2 in
+    P8->SEL1 &= ~0x04; // configure P8.2 to TA3CCI2A
+    P8->DIR &= ~0x04;  // make P8.2 in
     // initialize P10.4 and make it input (P10.4 TA3CCI0A)
     P10->SEL0 |= 0x10;
-    P10->SEL1 &= ~0x10;                 // configure P8.2 to TA3CCI0A
-    P10->DIR &= ~0x10;                  // make P8.2 in
+    P10->SEL1 &= ~0x10; // configure P8.2 to TA3CCI0A
+    P10->DIR &= ~0x10;  // make P8.2 in
 #else
     // initialize P10.4 and P10.5 and make them input (P10.4 TA3CCI0A, P10.5 TA3CCI1A)
     P10->SEL0 |= 0x30;
-    P10->SEL1 &= ~0x30;                 // configure P8.2 to TA3CCI0A
-    P10->DIR &= ~0x30;                  // make P8.2 in
+    P10->SEL1 &= ~0x30; // configure P8.2 to TA3CCI0A
+    P10->DIR &= ~0x30;  // make P8.2 in
 #endif
-    TIMER_A3->CTL &= ~0x0030;               // halt Timer A3
+    /*
+    What Does This Mean?
+    When rising edge detected on encoder pin
+    Timer captures its current count value
+    Stores in TIMER_A3->CCR[0] or CCR[1]
+    Generates interrupt
+    */
+    TIMER_A3->CTL &= ~0x0030; // halt Timer A3
     // bits15-10=XXXXXX, reserved
     // bits9-8=10,       clock source to SMCLK
     // bits7-6=00,       input clock divider /1
@@ -110,7 +120,7 @@ void TimerA3Capture_Init(void(*task0)(uint16_t time), void(*task2)(uint16_t time
     // bit2=X,           output this value in output mode 0
     // bit1=X,           capture overflow status
     // bit0=0,           clear capture/compare interrupt pending
-#if (RSLK_MAX==0)
+#if (RSLK_MAX == 0)
     TIMER_A3->CCTL[2] = 0x4910;
 #else
     TIMER_A3->CCTL[1] = 0x4910;
@@ -134,12 +144,12 @@ void TimerA3Capture_Init(void(*task0)(uint16_t time), void(*task2)(uint16_t time
     TIMER_A3->EX0 &= ~0x0007;
 
     // priority 2 for TA3.0 and TA3.x. Four INTs per IP[] register. Only MS 3 bits valid.
-    NVIC->IP[2] = (NVIC->IP[3]&0x0000FFFF)|0x40400000;
+    NVIC->IP[2] = (NVIC->IP[3] & 0x0000FFFF) | 0x40400000;
 
     // interrupts enabled in the main program after all devices initialized
     NVIC->ISER[0] |= 0x0000C000; // enable interrupt 15 (TA3.x) and 14 (TA3.0) in NVIC
 
-    TIMER_A3->CTL |= 0x0024;        // reset and start Timer A3 in continuous up mode
+    TIMER_A3->CTL |= 0x0024; // reset and start Timer A3 in continuous up mode
     // bits15-10=XXXXXX, reserved
     // bits9-8=10,       clock source to SMCLK
     // bits7-6=00,       input clock divider /1
@@ -148,23 +158,23 @@ void TimerA3Capture_Init(void(*task0)(uint16_t time), void(*task2)(uint16_t time
     // bit2=1,           set this bit to clear
     // bit1=0,           interrupt disable (no interrupt on rollover)
     // bit0=0,           clear interrupt pending
-
 }
 
-void TA3_0_IRQHandler(void){
-  // write this as part of lab 4
-    TIMER_A3->CCTL[0] &= ~0x0001;             // acknowledge capture/compare interrupt 0
-    (*CaptureTask0)(TIMER_A3->CCR[0]);         // execute user task
+void TA3_0_IRQHandler(void) // For right wheel
+{
+    // write this as part of lab 4
+    TIMER_A3->CCTL[0] &= ~0x0001;      // acknowledge capture/compare interrupt 0
+    (*CaptureTask0)(TIMER_A3->CCR[0]); // execute user task with captured time value
 }
 
-void TA3_N_IRQHandler(void){
-  // write this as part of lab 4
-#if (RSLK_MAX==0)
-    TIMER_A3->CCTL[2] &= ~0x0001;             // acknowledge capture/compare interrupt 2
-    (*CaptureTask2)(TIMER_A3->CCR[2]);         // execute user task
+void TA3_N_IRQHandler(void) // For left wheel
+{
+    // write this as part of lab 4
+#if (RSLK_MAX == 0)
+    TIMER_A3->CCTL[2] &= ~0x0001;      // acknowledge capture/compare interrupt 2
+    (*CaptureTask2)(TIMER_A3->CCR[2]); // execute user task
 #else
-    TIMER_A3->CCTL[1] &= ~0x0001;             // acknowledge capture/compare interrupt 2
-    (*CaptureTask2)(TIMER_A3->CCR[1]);         // execute user task
+    TIMER_A3->CCTL[1] &= ~0x0001;      // acknowledge capture/compare interrupt 2
+    (*CaptureTask2)(TIMER_A3->CCR[1]); // execute user task
 #endif
 }
-

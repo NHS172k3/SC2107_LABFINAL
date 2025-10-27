@@ -63,36 +63,44 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "..\inc\TExaS.h"
 
 volatile uint8_t reflectance_data, bump_data;
-volatile uint32_t MainCount=0;
+volatile uint32_t MainCount = 0;
 
-void SysTick_Handler(void){ // every 1ms
-    volatile static uint8_t count=0;
-    if(count==0){
+void SysTick_Handler(void)
+{ // this is run every 1ms when the SysTick interrupt occurs
+    volatile static uint8_t count = 0;
+    if (count == 0)
+    {
         Reflectance_Start();
     }
-    else if (count==1) {
-        reflectance_data =  Reflectance_End();
+    else if (count == 1) // every 10ms this happens
+    {
+        // Polling for reflectance and bump data
+        reflectance_data = Reflectance_End();
         bump_data = Bump_Read();
     }
     count++;
-    if(count==10)count=0;
+    if (count == 10)
+        count = 0;
 }
 
-int main(void){
+int main(void)
+{
 
-volatile uint8_t data_pins;
+    volatile uint8_t data_pins;
 
     Clock_Init48MHz();
     LaunchPad_Init();
     Bump_Init();
     Reflectance_Init();
     TExaS_Init(LOGICANALYZER_P7);
-    SysTick_Init(48000,1);  // set up SysTick for 1000 Hz interrupts
+    SysTick_Init(48000, 1); // set up SysTick for 1000 Hz interrupts
     EnableInterrupts();
 
-    while(1){
-      WaitForInterrupt();
-      if(MainCount%1000 == 0)P2->OUT ^= 0x01; // foreground thread
-      MainCount++;
+    while (1)
+    {
+        WaitForInterrupt();        // low power mode while waiting for interrupt
+        if (MainCount % 1000 == 0) //  Toggle LED every 1000 iterations (every 1000ms = 1 second)
+            P2->OUT ^= 0x01;       // Heartbeat Blink
+        MainCount++;
     }
 }

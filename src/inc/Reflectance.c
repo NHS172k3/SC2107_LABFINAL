@@ -43,7 +43,6 @@ those of the authors and should not be interpreted as representing official
 policies, either expressed or implied, of the FreeBSD Project.
 */
 
-
 // reflectance LED illuminate connected to P5.3
 // reflectance sensor 1 connected to P7.0 (robot's right, robot off road to left)
 // reflectance sensor 2 connected to P7.1
@@ -61,7 +60,7 @@ policies, either expressed or implied, of the FreeBSD Project.
 #define RSLK_MAX 1
 
 #if (RSLK_MAX)
-void Port9_Init(void); //RSLK-MAX
+void Port9_Init(void); // RSLK-MAX
 #endif
 
 void Port5_Init(void);
@@ -77,71 +76,68 @@ void Port7_InitToInput(void);
 // Input: none
 // Output: none
 
-void Reflectance_Init(void){
-    Port5_Init();
-    Port7_Init();
+void Reflectance_Init(void)
+{
+  Port5_Init();
+  Port7_Init();
 #if (RSLK_MAX)
-    //RSLK-MAX
-    Port9_Init();
+  // RSLK-MAX
+  Port9_Init();
 #endif
 }
 // Initialisation Step 1.
 // Initialise Port 5 and Port 9 for Reflectance Sensing
 // Registers: SEL0, SEL1, DIR, REN, OUT.
-void Port5_Init(void){
-    // write this as part of Lab 2
-    // Code to initialise GPIO related registers
-    P5->SEL0 &= ~0x08;
-    P5->SEL1 &= ~0x08;
-    P5->DIR |= 0x08;
-    P5->OUT &= ~0x08;
-
-
+void Port5_Init(void)
+{
+  // write this as part of Lab 2
+  // Code to initialise GPIO related registers
+  P5->SEL0 &= ~0x08;
+  P5->SEL1 &= ~0x08;
+  P5->DIR |= 0x08;
+  P5->OUT &= ~0x08;
 }
 
-void Port9_Init(void){
-    // write this as part of Lab 2
-    // Code to initialise GPIO related registers
-    P9->SEL0 &= ~0x04;
-    P9->SEL1 &= ~0x04;
-    P9->DIR |= 0x04;
-    P9->OUT &= ~0x04;
-
+void Port9_Init(void)
+{
+  // write this as part of Lab 2
+  // Code to initialise GPIO related registers
+  P9->SEL0 &= ~0x04;
+  P9->SEL1 &= ~0x04;
+  P9->DIR |= 0x04;
+  P9->OUT &= ~0x04;
 }
 
 // Initialisation Step 2.
 // Initialise Port 7 for Reflectance Sensing
 // Registers: SEL0, SEL1, DIR.
-void Port7_Init(void){
-    // write this as part of Lab 2
-    // Code to initialise GPIO related registers
-    P7->SEL0 = 0x00;
-    P7->SEL1 = 0x00;
-    P7->DIR = 0x00;
-
+void Port7_Init(void)
+{
+  // write this as part of Lab 2
+  // Code to initialise GPIO related registers
+  P7->SEL0 = 0x00;
+  P7->SEL1 = 0x00;
+  P7->DIR = 0x00;
 }
 
 // Reflectance Reading Step 2.
 // Set Port7 to output high to charge the capacitors
 // Registers: DIR, OUT.
-void Port7_Output_ChargeCap(void){
-    // write this as part of Lab 2
-    P7->DIR = 0xFF;
-    P7->OUT = 0xFF;
-
+void Port7_Output_ChargeCap(void)
+{
+  // write this as part of Lab 2
+  P7->DIR = 0xFF;
+  P7->OUT = 0xFF;
 }
 
 // Reflectance reading Step 4.
 // Initialise Port7 to input mode
 // Registers: DIR.
-void Port7_InitToInput(void){
-    // write this as part of Lab 2
-    P7->DIR = 0x00;
-
+void Port7_InitToInput(void)
+{
+  // write this as part of Lab 2
+  P7->DIR = 0x00;
 }
-
-
-
 
 // ------------Reflectance_Read------------
 // Read the eight sensors
@@ -154,28 +150,27 @@ void Port7_InitToInput(void){
 // Input: time to wait in usec
 // Output: sensor readings
 // Assumes: Reflectance_Init() has been called
-uint8_t Reflectance_Read(uint32_t time){
+uint8_t Reflectance_Read(uint32_t time)
+{
   uint8_t result;
   // write this as part of Lab 2
   // Translate Step 1-8 of the reflectance read procedure to code.
 
   // Step1.  RSLK-MAX. P5.3 = HIGH and P9.2 = HIGH => IR LED ON
-  P5->OUT |= 0x08;
-#if(RSLK_MAX)
-  P9->OUT |= 0x04;
+  P5->OUT |= 0x08; // Even Sensors IR LED output
+#if (RSLK_MAX)
+  P9->OUT |= 0x04; // Odd Sensors IR LED output
 #endif
-  Port7_Output_ChargeCap();     // Step2
-
+  Port7_Output_ChargeCap(); // Step2
 
   Clock_Delay1us(10);
-  Port7_InitToInput();     // Step4
+  Port7_InitToInput(); // Step4
   Clock_Delay1us(time);
   result = P7->IN;
   P5->OUT &= ~0x08;
-#if(RSLK_MAX)
+#if (RSLK_MAX)
   P9->OUT &= ~0x04;
 #endif
-
 
   return result;
 }
@@ -196,40 +191,41 @@ uint8_t Reflectance_Read(uint32_t time){
 // 1,0          left left      off to right
 // 0,0          neither        lost
 // Assumes: Reflectance_Init() has been called
-uint8_t Reflectance_Center(uint32_t time){
-    uint8_t result;
-    // write this as part of Lab 2
-    // Use bit shifting and extraction to shift the center two bits to the
-    // right to occupy the last two bits of the result variable
-    result = Reflectance_Read(time);
-    result = result >> 3;
-    result &= 0x03;
-    return result;
+uint8_t Reflectance_Center(uint32_t time)
+{
+  uint8_t result;
+  // write this as part of Lab 2
+  // Use bit shifting and extraction to shift the center two bits to the
+  // right to occupy the last two bits of the result variable
+  result = Reflectance_Read(time);
+  result = result >> 3;
+  result &= 0x03;
+  return result;
 }
-
 
 // Perform sensor integration
 // Input: data is 8-bit result from line sensor
 // Output: position in 0.1mm relative to center of line
-int32_t Reflectance_Position(uint8_t data){
-    uint32_t position = 0;
-    uint32_t bitval = 0;
-    uint32_t bittotal = 0;
-    // write this as part of Lab 2
-    // Extract the appropriate bits from the reflectance read data
-    // to multiply to the corresponding weights in W[].
-    // Bit shifting and extraction.
-    int32_t W[8] = {332, 237, 142, 47, -47, -142, -237, -332};
-    for (int i=0; i<8; i++){
-        bitval = data & 0x01;
-        position = position + W[i]*bitval;
-        data = data >> 1;
-        bittotal = bittotal + bitval;
-    }
-    position = position/bittotal;
-    return position;
+int32_t Reflectance_Position(uint8_t data)
+{
+  uint32_t position = 0;
+  uint32_t bitval = 0;
+  uint32_t bittotal = 0;
+  // write this as part of Lab 2
+  // Extract the appropriate bits from the reflectance read data
+  // to multiply to the corresponding weights in W[].
+  // Bit shifting and extraction.
+  int32_t W[8] = {332, 237, 142, 47, -47, -142, -237, -332};
+  for (int i = 0; i < 8; i++)
+  {
+    bitval = data & 0x01;
+    position = position + W[i] * bitval;
+    data = data >> 1;
+    bittotal = bittotal + bitval;
+  }
+  position = position / bittotal;
+  return position;
 }
-
 
 // ------------Reflectance_Start------------
 // Begin the process of reading the eight sensors
@@ -239,21 +235,19 @@ int32_t Reflectance_Position(uint8_t data){
 // Input: none
 // Output: none
 // Assumes: Reflectance_Init() has been called
-void Reflectance_Start(void){
-    // write this as part of Lab 3
+void Reflectance_Start(void)
+{
+  // write this as part of Lab 3
 
-    P5->OUT |= 0x08;
-  #if(RSLK_MAX)
-    P9->OUT |= 0x04;
-  #endif
-    Port7_Output_ChargeCap();     // Step2
+  P5->OUT |= 0x08;
+#if (RSLK_MAX)
+  P9->OUT |= 0x04;
+#endif
+  Port7_Output_ChargeCap(); // Step2
 
-
-    Clock_Delay1us(10);
-    Port7_InitToInput();     // Step4
-
+  Clock_Delay1us(10);
+  Port7_InitToInput(); // Step4
 }
-
 
 // ------------Reflectance_End------------
 // Finish reading the eight sensors
@@ -263,18 +257,15 @@ void Reflectance_Start(void){
 // Output: sensor readings
 // Assumes: Reflectance_Init() has been called
 // Assumes: Reflectance_Start() was called 1 ms ago
-uint8_t Reflectance_End(void){
-    uint8_t result;
-    // write this as part of Lab 3
-    // Step 6-7 of Reflectance Read in Lab2.
-    result = P7->IN;
-    P5->OUT &= ~0x08;
-  #if(RSLK_MAX)
-    P9->OUT &= ~0x04;
-  #endif
-    return result;
+uint8_t Reflectance_End(void)
+{
+  uint8_t result;
+  // write this as part of Lab 3
+  // Step 6-7 of Reflectance Read in Lab2.
+  result = P7->IN;
+  P5->OUT &= ~0x08;
+#if (RSLK_MAX)
+  P9->OUT &= ~0x04;
+#endif
+  return result;
 }
-
-
-
-
